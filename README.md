@@ -1,0 +1,1 @@
+Deben crear una carpeta .env, dentro de esa carpeta registran sus datos para poder conectarse a la base de datos y para iniciar su app. Tienen un ejemplo dentro de env.text. Tampoco olviden crear su entorno virtual.

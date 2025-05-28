@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+  <h2 class="fw-bold"><i class="bi bi-book-half me-2"></i>Libros disponibles</h2>
+  {% if user.is_authenticated %}
+  <div>
+    <a class="btn btn-outline-success btn-sm me-2" href="{% url 'registrar_autor' %}">
+      <i class="bi bi-person-plus"></i> Autor
+    </a>
+    <a class="btn btn-outline-primary btn-sm" href="{% url 'registrar_libro' %}">
+      <i class="bi bi-plus-circle"></i> Libro
+    </a>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Filtro -->
+<div class="mb-4">
+  <label for="filtro-genero" class="form-label fw-semibold">Filtrar por género:</label>
+  <select id="filtro-genero" class="form-select w-auto">
+    <option value="todos">Todos</option>
+    {% for genero in generos %}
+    <option value="{{ genero.nombre }}">{{ genero.nombre }}</option>
+    {% endfor %}
+  </select>
+</div>
+
+<!-- Contenedor de libros -->
+<div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-3" id="libros-container">
+  {% for libro in libros %}
+  <div class="col libro-item" data-generos="{{ libro.generos.all|join:',' }}">
+    <div class="card h-100 border-0 shadow-sm rounded-3">
+
+      {% if libro.imagen_portada %}
+      <div class="bg-white d-flex align-items-center justify-content-center" style="height: 180px;">
+        <img src="{{ libro.imagen_portada.url }}" class="img-fluid"
+          style="max-height: 100%; max-width: 100%; object-fit: contain;" alt="Portada de {{ libro.titulo }}">
+      </div>
+      {% else %}
+      <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+        <span class="text-muted">Sin imagen</span>
+      </div>
+      {% endif %}
+
+      <div class="card-body p-3 d-flex flex-column">
+        <h6 class="card-title text-truncate mb-1" title="{{ libro.titulo }}">{{ libro.titulo }}</h6>
+        <small class="text-muted">por {{ libro.autor.nombre }}</small>
+        <small class="text-muted mb-2">⭐ {{ libro.promedio_calificacion|default:"Sin calificar" }}</small>
+
+        <!-- Géneros -->
+        <div class="mb-2">
+          {% for genero in libro.generos.all %}
+          <span class="badge bg-light text-dark border me-1">{{ genero.nombre }}</span>
+          {% endfor %}
+        </div>
+
+        <!-- Botones -->
+        <div class="mt-auto">
+          {% if libro.pdf_url %}
+          <a href="{{ libro.pdf_url }}" class="btn btn-sm btn-outline-primary w-100 mb-2" download>
+            <i class="bi bi-file-earmark-arrow-down"></i> Descargar PDF
+          </a>
+          {% endif %}
+          <a href="{% url 'libro_detalle' libro.pk %}" class="btn btn-sm btn-outline-info w-100 mb-1">
+            <i class="bi bi-chat-dots"></i> Ver reseñas
+          </a>
+          {% if user.is_authenticated and user == libro.usuario_subio %}
+          <a href="#" class="btn btn-sm btn-outline-secondary w-100">Editar</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- JS para filtro -->
+<script>
+  document.getElementById("filtro-genero").addEventListener("change", function () {
+    const seleccion = this.value.toLowerCase();
+    const items = document.querySelectorAll(".libro-item");
+
+    items.forEach(function (item) {
+      const generos = item.getAttribute("data-generos").toLowerCase();
+      item.style.display = (seleccion === "todos" || generos.includes(seleccion)) ? "block" : "none";
+    });
+  });
+</script>
+
+{% endblock %}

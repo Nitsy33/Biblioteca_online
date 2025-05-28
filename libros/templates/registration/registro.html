@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro | Biblioteca Virtual</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://unpkg.com/lucide@latest" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b, #0f172a);
+      background-size: 400% 400%;
+      animation: gradientShift 20s ease infinite;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #f8fafc;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .register-container {
+      backdrop-filter: blur(15px);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 35px 45px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 420px;
+      animation: fadeIn 1s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      text-align: center;
+      color: #60a5fa;
+      margin-bottom: 25px;
+      font-size: 28px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      background: rgba(255, 255, 255, 0.1);
+      color: #f1f5f9;
+      font-size: 14px;
+      outline: none;
+      transition: border 0.3s ease;
+    }
+
+    input:focus {
+      border-color: #60a5fa;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      border-radius: 12px;
+      font-weight: bold;
+      color: #fff;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.4s ease, transform 0.2s;
+    }
+
+    button:hover {
+      transform: scale(1.02);
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .login-link a {
+      color: #93c5fd;
+      text-decoration: none;
+    }
+
+    .form-feedback {
+      color: #f87171;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .success-message,
+    .error-message {
+      font-size: 14px;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .success-message {
+      color: #4ade80;
+    }
+
+    .error-message {
+      color: #f87171;
+    }
+
+    .icon {
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    .form-group-password {
+      position: relative;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <h2><i data-lucide="book-user" class="icon"></i> Crear cuenta</h2>
+    <form id="registro-form">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="id_username"><i data-lucide="user" class="icon"></i>Nombre de usuario</label>
+        <input type="text" id="id_username" name="username" placeholder="ej. bibliophileX" required>
+        <div class="form-feedback" id="feedback-username"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="id_email"><i data-lucide="mail" class="icon"></i>Correo electrónico</label>
+        <input type="email" id="id_email" name="email" placeholder="ej. ejemplo@correo.com" required>
+        <div class="form-feedback" id="feedback-email"></div>
+      </div>
+
+      <div class="form-group form-group-password">
+        <label for="id_password1"><i data-lucide="lock" class="icon"></i>Contraseña</label>
+        <input type="password" id="id_password1" name="password1" required>
+        <i data-lucide="eye-off" class="password-toggle" onclick="togglePassword('id_password1', this)"></i>
+        <div class="form-feedback" id="feedback-password1"></div>
+      </div>
+
+      <div class="form-group form-group-password">
+        <label for="id_password2"><i data-lucide="lock-keyhole" class="icon"></i>Confirmar contraseña</label>
+        <input type="password" id="id_password2" name="password2" required>
+        <i data-lucide="eye-off" class="password-toggle" onclick="togglePassword('id_password2', this)"></i>
+        <div class="form-feedback" id="feedback-password2"></div>
+      </div>
+
+      <button type="submit">Registrarse</button>
+      <div class="success-message" id="success-message"></div>
+      <div class="error-message" id="error-message"></div>
+    </form>
+
+    <div class="login-link">
+      ¿Ya tenés cuenta? <a href="{% url 'login' %}">Iniciar sesión</a>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    lucide.createIcons();
+
+    function togglePassword(inputId, iconEl) {
+      const input = document.getElementById(inputId);
+      const isHidden = input.type === 'password';
+      input.type = isHidden ? 'text' : 'password';
+      iconEl.setAttribute('data-lucide', isHidden ? 'eye' : 'eye-off');
+      lucide.createIcons();
+    }
+
+    document.getElementById("registro-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = new FormData(form);
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+      try {
+        const response = await fetch("{% url 'registro' %}", {
+          method: "POST",
+          headers: { "X-CSRFToken": csrfToken },
+          body: data
+        });
+
+        const html = await response.text();
+        if (response.ok) {
+          document.getElementById("success-message").textContent = "Cuenta creada con éxito. Redirigiendo...";
+          setTimeout(() => window.location.href = "{% url 'login' %}", 1500);
+        } else {
+          const doc = new DOMParser().parseFromString(html, 'text/html');
+          const errors = doc.querySelectorAll('.errorlist');
+          let errorMsg = "";
+          errors.forEach(e => errorMsg += e.innerText + "\n");
+          document.getElementById("error-message").textContent = errorMsg || "Error al registrar.";
+        }
+      } catch (err) {
+        document.getElementById("error-message").textContent = "Error inesperado. Intente más tarde.";
+      }
+    });
+
+    document.getElementById("id_username").addEventListener("blur", () => verificarExistencia('username'));
+    document.getElementById("id_email").addEventListener("blur", () => verificarExistencia('email'));
+
+    async function verificarExistencia(campo) {
+      const valor = document.getElementById(`id_${campo}`).value;
+      if (!valor) return;
+      const response = await fetch("{% url 'verificar_existencia_usuario' %}?" + campo + "=" + encodeURIComponent(valor));
+      const data = await response.json();
+      const feedback = document.getElementById(`feedback-${campo}`);
+      if (data[`${campo}_existe`]) {
+        feedback.style.display = "block";
+        feedback.textContent = `Este ${campo === 'email' ? 'correo electrónico' : 'nombre de usuario'} ya está registrado.`;
+      } else {
+        feedback.style.display = "none";
+        feedback.textContent = "";
+      }
+    }
+  </script>
+</body>
+</html>

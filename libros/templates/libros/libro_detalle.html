@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+
+  <!-- 📘 Información del libro -->
+  <div class="card mb-4">
+    <div class="row g-0">
+      {% if libro.imagen_portada %}
+        <div class="col-md-4">
+          <img src="{{ libro.imagen_portada.url }}" class="img-fluid rounded-start" alt="Portada">
+        </div>
+      {% endif %}
+      <div class="col-md-8">
+        <div class="card-body">
+          <h3 class="card-title">{{ libro.titulo }}</h3>
+          <p class="card-text"><strong>Autor:</strong> {{ libro.autor.nombre }}</p>
+          <p class="card-text"><strong>Editorial:</strong> {{ libro.editorial }}</p>
+          <p class="card-text"><strong>Idioma:</strong> {{ libro.idioma }}</p>
+          <p class="card-text"><strong>Fecha de emisión:</strong> {{ libro.fecha_emision }}</p>
+          <p class="card-text"><strong>ISBN:</strong> {{ libro.isbn }}</p>
+          <p class="card-text">{{ libro.descripcion }}</p>
+
+          <!-- 📥 Botón de descarga -->
+          <a href="{{ libro.pdf_url.url }}" class="btn btn-success mt-2" download>📥 Descargar PDF</a>
+
+          <!-- ⭐ Promedio de calificación -->
+          {% if promedio %}
+            <p class="mt-2"><strong>Calificación promedio:</strong> {{ promedio|floatformat:1 }} ⭐</p>
+          {% else %}
+            <p class="mt-2 text-muted">Este libro aún no tiene calificaciones.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✍ Formulario de calificación y reseña -->
+  <div class="card mb-4">
+    <div class="card-header">Escribe tu reseña y calificación</div>
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+
+        <div class="mb-3">
+          <label for="id_puntaje" class="form-label">Tu calificación</label>
+          {{ calificacion_form.puntaje }}
+        </div>
+
+        <div class="mb-3">
+          <label for="id_comentario" class="form-label">Tu reseña</label>
+          {{ reseña_form.comentario }}
+        </div>
+
+        <div class="form-check mb-3">
+          {{ reseña_form.positiva }} 
+          <label class="form-check-label" for="id_positiva">¿Reseña positiva?</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Enviar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 💬 Reseñas -->
+  <h4>Reseñas de usuarios:</h4>
+  {% for reseña in reseñas %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">
+          {{ reseña.usuario.username }}
+          <small class="text-muted">{{ reseña.fecha|date:"d M Y H:i" }}</small>
+        </h5>
+
+        <!-- ⭐ Mostrar calificación si existe -->
+        {% if reseña.calificacion %}
+          <p class="mb-1">Calificación: {{ reseña.calificacion.puntaje }} ⭐</p>
+        {% endif %}
+
+        <p class="card-text">{{ reseña.comentario }}</p>
+        <p class="card-text">
+          {% if reseña.positiva %}
+            <span class="text-success">👍 Reseña positiva</span>
+          {% else %}
+            <span class="text-danger">👎 Reseña negativa</span>
+          {% endif %}
+        </p>
+      </div>
+    </div>
+  {% empty %}
+    <p class="text-muted">Aún no hay reseñas.</p>
+  {% endfor %}
+
+</div>
+{% endblock %}

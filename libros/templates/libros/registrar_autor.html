@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registrar Autor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 p-6">
+
+  <div class="max-w-xl mx-auto bg-white rounded-xl shadow-md p-8">
+    <h2 class="text-2xl font-bold text-center mb-6">Registrar Autor</h2>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
+      {% csrf_token %}
+      <div>
+        <label class="block font-medium">Nombre del Autor:</label>
+        <input type="text" name="nombre" class="w-full p-2 border border-gray-300 rounded" required>
+      </div>
+      <div>
+        <label class="block font-medium">Biografía:</label>
+        <textarea name="biografia" rows="4" class="w-full p-2 border border-gray-300 rounded"></textarea>
+      </div>
+      <div>
+        <label class="block font-medium">Fecha de nacimiento:</label>
+        <input type="date" name="fecha_nacimiento" class="w-full p-2 border border-gray-300 rounded">
+      </div>
+      <div>
+        <label class="block font-medium">Foto del autor (opcional):</label>
+        <input type="file" name="foto" class="w-full p-2 border border-gray-300 rounded" accept="image/*">
+      </div>
+      <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Registrar Autor</button>
+    </form>
+  </div>
+
+</body>
+</html>

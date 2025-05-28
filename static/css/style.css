@@ -1,0 +1,21 @@
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+.card-title {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: scale(1.02);
+}

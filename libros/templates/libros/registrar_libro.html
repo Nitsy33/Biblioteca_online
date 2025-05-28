@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrar Libro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .tag {
+      background-color: #ebf8ff;
+      color: #2b6cb0;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .tag button {
+      margin-left: 0.5rem;
+      color: #3182ce;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .tag button:hover {
+      color: #e53e3e;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+  <div class="w-full min-h-screen flex items-start justify-center p-4">
+    <div class="w-full max-w-5xl bg-white rounded-2xl shadow-xl p-6 md:p-10 space-y-8">
+      <h2 class="text-3xl font-bold text-center text-gray-800">📖 Registrar Libro</h2>
+
+      <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Título, Género -->
+        <div class="grid md:grid-cols-3 gap-4 items-start">
+          <div class="md:col-span-2">
+            <label class="block font-medium text-gray-700 mb-1">Título</label>
+            <input type="text" name="titulo" required class="input-field" />
+          </div>
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">Géneros</label>
+            <input list="genero-list" id="genero-input" placeholder="Escribe y presiona Enter"
+              class="input-field-small" />
+            <datalist id="genero-list">
+              {% for genero in generos %}
+              <option value="{{ genero.nombre }}"></option>
+              {% endfor %}
+            </datalist>
+            <div id="genero-tags" class="mt-2 flex flex-wrap"></div>
+            <div id="genero-hidden-fields"></div>
+          </div>
+        </div>
+
+        <!-- Autor -->
+        <div>
+          <label class="block font-medium text-gray-700 mb-1">Autor</label>
+          <input list="autor-list" id="autor-input" name="autor" class="input-field" />
+          <datalist id="autor-list">
+            {% for autor in autores %}
+            <option value="{{ autor.nombre }}"></option>
+            {% endfor %}
+          </datalist>
+        </div>
+
+        <!-- Descripción + Otros campos -->
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">Descripción</label>
+            <textarea name="descripcion" rows="8" class="input-field h-full"></textarea>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="block font-medium text-gray-700 mb-1">Idioma</label>
+              <input type="text" name="idioma" required class="input-field-small" />
+            </div>
+            <div>
+              <label class="block font-medium text-gray-700 mb-1">ISBN (13 dígitos)</label>
+              <input type="text" name="isbn" id="isbn" required class="input-field-small" maxlength="13" />
+              <p id="isbn-error" class="text-red-500 text-sm mt-1 hidden"></p>
+            </div>
+
+            <div>
+              <label class="block font-medium text-gray-700 mb-1">Editorial</label>
+              <input type="text" name="editorial" required class="input-field-small" />
+            </div>
+            <div>
+              <label class="block font-medium text-gray-700 mb-1">Fecha de Emisión</label>
+              <input type="date" name="fecha_emision" class="input-field-small" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Archivos -->
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">Archivo PDF</label>
+            <input type="file" name="pdf_url" accept="application/pdf" class="input-field" />
+          </div>
+          <div>
+            <label class="block font-medium text-gray-700 mb-1">Imagen de portada</label>
+            <input type="file" name="imagen_portada" id="imagen_portada" accept="image/*" class="input-field" />
+            <div class="mt-3">
+              <img id="preview_portada" src="#" alt="Vista previa de la portada"
+                class="rounded-xl max-h-64 hidden border border-gray-300 shadow-md" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Botón -->
+        <div class="pt-4">
+          <button type="submit"
+            class="w-full bg-blue-600 text-white py-3 rounded-xl text-lg font-semibold hover:bg-blue-700 transition duration-200">
+            📚 Registrar Libro
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <style>
+    .input-field {
+      width: 100%;
+      padding: 0.75rem;
+      /* equivalente a p-3 */
+      border: 1px solid #d1d5db;
+      /* border-gray-300 */
+      border-radius: 0.75rem;
+      /* rounded-xl */
+      outline: none;
+    }
+
+    .input-field:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px #3b82f6;
+      /* focus:ring-2 focus:ring-blue-500 */
+    }
+
+    .input-field-small {
+      width: 100%;
+      padding: 0.5rem;
+      /* p-2 */
+      font-size: 0.875rem;
+      /* text-sm */
+      border: 1px solid #d1d5db;
+      border-radius: 0.75rem;
+    }
+
+    .input-field-small:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px #3b82f6;
+    }
+  </style>
+
+
+  <script>
+    const generoInput = document.getElementById('genero-input');
+    const generoTags = document.getElementById('genero-tags');
+    const hiddenFields = document.getElementById('genero-hidden-fields');
+
+    const selectedGeneros = new Set();
+
+    generoInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const value = generoInput.value.trim();
+        if (value && !selectedGeneros.has(value)) {
+          selectedGeneros.add(value);
+          addGeneroTag(value);
+          generoInput.value = '';
+        }
+      }
+    });
+
+    function addGeneroTag(name) {
+      const tag = document.createElement('div');
+      tag.className = 'tag';
+      tag.innerHTML = `${name} <button onclick="removeGeneroTag('${name}')">&times;</button>`;
+      generoTags.appendChild(tag);
+
+      const hidden = document.createElement('input');
+      hidden.type = 'hidden';
+      hidden.name = 'generos';
+      hidden.value = name;
+      hidden.id = `hidden-${name}`;
+      hiddenFields.appendChild(hidden);
+    }
+
+    function removeGeneroTag(name) {
+      selectedGeneros.delete(name);
+      document.getElementById(`hidden-${name}`)?.remove();
+      [...generoTags.children].forEach(tag => {
+        if (tag.textContent.includes(name)) tag.remove();
+      });
+    }
+
+
+    document.getElementById('imagen_portada').addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      const preview = document.getElementById('preview_portada');
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+          preview.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      } else {
+        preview.src = "#";
+        preview.classList.add('hidden');
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.querySelector("form"); // Ajustá si tu formulario tiene un id
+      const isbnInput = document.getElementById("isbn");
+      const errorMsg = document.getElementById("isbn-error");
+
+      form.addEventListener("submit", function (event) {
+        const isbn = isbnInput.value.trim();
+
+        if (isbn.length !== 13 || !/^\d{13}$/.test(isbn)) {
+          errorMsg.textContent = "El ISBN debe tener exactamente 13 dígitos numéricos";
+          errorMsg.classList.remove("hidden");
+          isbnInput.classList.add("border-red-500");
+          event.preventDefault(); // Cancela el envío
+        } else {
+          errorMsg.classList.add("hidden");
+          isbnInput.classList.remove("border-red-500");
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

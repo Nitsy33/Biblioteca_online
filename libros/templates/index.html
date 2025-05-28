@@ -2,8 +2,16 @@
 {% load static %}
 {% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-  <h2 class="fw-bold"><i class="bi bi-book-half me-2"></i>Libros disponibles</h2>
+<!-- Título + Buscador + Botones -->
+<div class="d-flex justify-content-between align-items-end mb-4 border-bottom pb-2">
+  <div class="d-flex align-items-center">
+    <h2 class="fw-bold me-3"><i class="bi bi-book-half me-2"></i>Libros disponibles</h2>
+    <form method="get" class="d-flex" role="search">
+      <input type="text" name="q" value="{{ request.GET.q }}" class="form-control form-control-sm me-2"
+             placeholder="Buscar título o autor...">
+      <button type="submit" class="btn btn-sm btn-outline-secondary"><i class="bi bi-search"></i></button>
+    </form>
+  </div>
   {% if user.is_authenticated %}
   <div>
     <a class="btn btn-outline-success btn-sm me-2" href="{% url 'registrar_autor' %}">
@@ -16,7 +24,7 @@
   {% endif %}
 </div>
 
-<!-- Filtro -->
+<!-- Filtro por género -->
 <div class="mb-4">
   <label for="filtro-genero" class="form-label fw-semibold">Filtrar por género:</label>
   <select id="filtro-genero" class="form-select w-auto">
@@ -27,7 +35,7 @@
   </select>
 </div>
 
-<!-- Contenedor de libros -->
+<!-- Lista de libros -->
 <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-3" id="libros-container">
   {% for libro in libros %}
   <div class="col libro-item" data-generos="{{ libro.generos.all|join:',' }}">
@@ -36,7 +44,7 @@
       {% if libro.imagen_portada %}
       <div class="bg-white d-flex align-items-center justify-content-center" style="height: 180px;">
         <img src="{{ libro.imagen_portada.url }}" class="img-fluid"
-          style="max-height: 100%; max-width: 100%; object-fit: contain;" alt="Portada de {{ libro.titulo }}">
+             style="max-height: 100%; max-width: 100%; object-fit: contain;" alt="Portada de {{ libro.titulo }}">
       </div>
       {% else %}
       <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
@@ -49,14 +57,12 @@
         <small class="text-muted">por {{ libro.autor.nombre }}</small>
         <small class="text-muted mb-2">⭐ {{ libro.promedio_calificacion|default:"Sin calificar" }}</small>
 
-        <!-- Géneros -->
         <div class="mb-2">
           {% for genero in libro.generos.all %}
           <span class="badge bg-light text-dark border me-1">{{ genero.nombre }}</span>
           {% endfor %}
         </div>
 
-        <!-- Botones -->
         <div class="mt-auto">
           {% if libro.pdf_url %}
           <a href="{{ libro.pdf_url }}" class="btn btn-sm btn-outline-primary w-100 mb-2" download>
@@ -76,7 +82,7 @@
   {% endfor %}
 </div>
 
-<!-- JS para filtro -->
+<!-- JS para filtrar por género -->
 <script>
   document.getElementById("filtro-genero").addEventListener("change", function () {
     const seleccion = this.value.toLowerCase();

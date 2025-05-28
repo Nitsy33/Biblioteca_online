@@ -18,7 +18,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Libro, Calificación, Reseña
 from .forms import CalificacionForm, ReseñaForm
 from django.contrib.auth.decorators import login_required
-from django.db.models import Avg
+from django.db.models import Q, Avg, Count
 
 from .models import Autor, Genero, Libro, Reseña, Calificación
 from .serializers import (
@@ -278,11 +278,23 @@ def verificar_existencia_usuario(request):
 # ===================== Vista Index para frontend =====================
 
 def index(request):
+    query = request.GET.get('q', '')
     libros = Libro.objects.annotate(
         promedio_calificacion=Avg('calificaciones__puntaje'),
         total_resenas=Count('resenas')
     )
-    return render(request, 'index.html', {'libros': libros})
+
+    if query:
+        libros = libros.filter(
+            Q(titulo__icontains=query) |
+            Q(autor__nombre__icontains=query)
+        )
+
+    generos = Genero.objects.all()
+    return render(request, 'index.html', {
+        'libros': libros,
+        'generos': generos,
+    })
 
 class RegistroUsuarioView(APIView):
     def post(self, request):
